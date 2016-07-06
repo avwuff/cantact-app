@@ -62,7 +62,10 @@ public final class TraceTopComponent extends TopComponent implements CanListener
 
         public void run() {
             /* calculate the relative timestamp in seconds */
-            float timestamp = (((float)(System.currentTimeMillis() - startTime)) 
+            float timestamp;
+            timestamp = frame.getTimestamp();
+            
+            if (timestamp == -1) timestamp = (((float)(System.currentTimeMillis() - startTime)) 
                     / 1000);
 
             // format ID as hex
@@ -74,16 +77,33 @@ public final class TraceTopComponent extends TopComponent implements CanListener
             }
             
             // format data as bytes in hex
+            // Also create numeric and text versions.
             String dataString = "";
+            String numString = "";
+            String textString = "";
+            
             for (int i = 0; i < frame.getDlc(); i++) {
+                int b = frame.getData()[i];
+                
                 dataString = dataString + String.format("%02X ", 
-                        frame.getData()[i]);
+                        b);
+                numString = numString + String.format("%03d ", 
+                        b);
+                
+                if (b >= 32 && b <= 127)
+                {
+                    textString += Character.toString((char)b);
+                } else {
+                    textString += ".";
+                }
+                
             }
+            
 
             // set the row data and insert the row
             DefaultTableModel messageModel = (DefaultTableModel) messageTable.getModel();
-            Object[] rowData = {(Object) timestamp, (Object) idString, 
-                (Object) frame.getDlc(), dataString};
+            Object[] rowData = {(Object) timestamp, (Object) idString, frame.getId(),  
+                (Object) frame.getDlc(), dataString, numString, textString};
             messageModel.insertRow(0, rowData);
         }
     }
@@ -91,7 +111,8 @@ public final class TraceTopComponent extends TopComponent implements CanListener
     @Override
     public void canReceived(CanFrame f) {
         // only receive the frame if trace is running and value is within filter
-        if (running && f.getId() > filterMinId && f.getId() < filterMaxId) {
+        // Update by Av: filter min and max are now inclusive
+        if (running && f.getId() >= filterMinId && f.getId() <= filterMaxId) {
             java.awt.EventQueue.invokeLater(new TraceUpdater(f));
         }
     }
@@ -110,6 +131,7 @@ public final class TraceTopComponent extends TopComponent implements CanListener
         minIdTextField = new javax.swing.JTextField();
         maxIdTextField = new javax.swing.JTextField();
         filterApplyButton = new javax.swing.JButton();
+        copyToMaxButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         messageTable = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
@@ -117,9 +139,10 @@ public final class TraceTopComponent extends TopComponent implements CanListener
         stopButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         filterButton = new javax.swing.JButton();
+        filterClearButton = new javax.swing.JButton();
 
         filterDialog.setLocation(new java.awt.Point(100, 100));
-        filterDialog.setMinimumSize(new java.awt.Dimension(300, 130));
+        filterDialog.setMinimumSize(new java.awt.Dimension(420, 140));
         filterDialog.setPreferredSize(new java.awt.Dimension(300, 130));
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.jLabel1.text")); // NOI18N
@@ -137,6 +160,13 @@ public final class TraceTopComponent extends TopComponent implements CanListener
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(copyToMaxButton, org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.copyToMaxButton.text")); // NOI18N
+        copyToMaxButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyToMaxButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout filterDialogLayout = new javax.swing.GroupLayout(filterDialog.getContentPane());
         filterDialog.getContentPane().setLayout(filterDialogLayout);
         filterDialogLayout.setHorizontalGroup(
@@ -149,11 +179,13 @@ public final class TraceTopComponent extends TopComponent implements CanListener
                             .addComponent(jLabel2)
                             .addComponent(jLabel1))
                         .addGap(18, 18, 18)
-                        .addGroup(filterDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(minIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(maxIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(filterDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(minIdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                            .addComponent(maxIdTextField))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(copyToMaxButton))
                     .addComponent(filterApplyButton))
-                .addContainerGap(147, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
         filterDialogLayout.setVerticalGroup(
             filterDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,14 +193,15 @@ public final class TraceTopComponent extends TopComponent implements CanListener
                 .addContainerGap()
                 .addGroup(filterDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(minIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(minIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(copyToMaxButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(filterDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(maxIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(filterApplyButton)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         messageTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -176,11 +209,11 @@ public final class TraceTopComponent extends TopComponent implements CanListener
 
             },
             new String [] {
-                "Timestamp", "ID", "DLC", "Data"
+                "Timestamp", "Hex ID", "ID", "DLC", "Hex", "Numeric", "Text"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -188,6 +221,15 @@ public final class TraceTopComponent extends TopComponent implements CanListener
             }
         });
         jScrollPane1.setViewportView(messageTable);
+        if (messageTable.getColumnModel().getColumnCount() > 0) {
+            messageTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title0")); // NOI18N
+            messageTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title1")); // NOI18N
+            messageTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title6")); // NOI18N
+            messageTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title2")); // NOI18N
+            messageTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title3")); // NOI18N
+            messageTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title4")); // NOI18N
+            messageTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.messageTable.columnModel.title5")); // NOI18N
+        }
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -240,6 +282,20 @@ public final class TraceTopComponent extends TopComponent implements CanListener
             }
         });
         jToolBar1.add(filterButton);
+
+        filterClearButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/cantact/ui/filter-clear.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(filterClearButton, org.openide.util.NbBundle.getMessage(TraceTopComponent.class, "TraceTopComponent.filterClearButton.text")); // NOI18N
+        filterClearButton.setFocusable(false);
+        filterClearButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        filterClearButton.setMaximumSize(new java.awt.Dimension(30, 30));
+        filterClearButton.setMinimumSize(new java.awt.Dimension(30, 30));
+        filterClearButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        filterClearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterClearButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(filterClearButton);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -312,7 +368,7 @@ public final class TraceTopComponent extends TopComponent implements CanListener
                     int id = Integer.valueOf(
                             model.getValueAt(row, 1).toString().substring(2), 
                             16);
-                    String data = (String) model.getValueAt(row, 3);
+                    String data = (String) model.getValueAt(row, 4);
 
                     /* create candump formatted string */
                     data = data.replace(" ", "");
@@ -346,9 +402,50 @@ public final class TraceTopComponent extends TopComponent implements CanListener
         }
     }//GEN-LAST:event_filterApplyButtonActionPerformed
 
+    private void filterClearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterClearButtonActionPerformed
+        // Clear the filter, so that all packets are logged.
+        filterMinId = 0;
+        filterMaxId = 0x7FFFFFFF;        
+        copyFilterToText();
+    }//GEN-LAST:event_filterClearButtonActionPerformed
+
+    private void copyToMaxButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyToMaxButtonActionPerformed
+        // Copy the value from Min to the Max box.  This makes it easier to set the value to the same thing on both and filter out just one packet.
+
+        try {
+            filterMinId = Integer.decode(minIdTextField.getText());
+        } catch (NumberFormatException e) {
+            // bad values, but do nothing
+        }
+
+        filterMaxId = filterMinId;
+        copyFilterToText();
+    }//GEN-LAST:event_copyToMaxButtonActionPerformed
+
+    public void FilterOnly(int ID)
+    {
+        // Set the filter so only this ID is shown
+        filterMinId = ID;
+        filterMaxId = ID;
+        copyFilterToText();
+        
+        // Start running.
+        if (!running) startButtonActionPerformed(null);
+    }
+    
+    private void copyFilterToText()
+    {
+        // Copy the filter IDs to the text fields.
+        maxIdTextField.setText(filterMaxId + "");
+        minIdTextField.setText(filterMinId + "");
+    }
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton copyToMaxButton;
     private javax.swing.JButton filterApplyButton;
     private javax.swing.JButton filterButton;
+    private javax.swing.JButton filterClearButton;
     private javax.swing.JDialog filterDialog;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

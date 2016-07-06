@@ -18,7 +18,10 @@ public class CantactDevice {
     private int speedMode = 0;
 
     public CantactDevice(String deviceName) {
-        serialPort = new SerialPort(deviceName);
+        if (deviceName != "")
+        {
+            serialPort = new SerialPort(deviceName);
+        }
     }
 
     public void setSpeedMode(int speedMode) {
@@ -82,7 +85,7 @@ public class CantactDevice {
         }
     }
 
-    private CanFrame slcanToFrame(Byte[] slcanData) {
+    protected CanFrame slcanToFrame(Byte[] slcanData) {
         CanFrame result = new CanFrame();
 
         Byte type = slcanData[0];
@@ -190,3 +193,5 @@ public class CantactDevice {
         }
     }
 }
+
+

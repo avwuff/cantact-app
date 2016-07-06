@@ -1,5 +1,7 @@
 package org.cantact.ui;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -61,12 +63,20 @@ public final class ConfigTopComponent extends TopComponent {
     private void initComponents() {
 
         startButton = new javax.swing.JButton();
-        portComboBox = new javax.swing.JComboBox<String>();
-        bitRateComboBox = new javax.swing.JComboBox<String>();
+        portComboBox = new javax.swing.JComboBox<>();
+        bitRateComboBox = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         refreshButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
+        debugDataButton = new javax.swing.JButton();
+        debugStop = new javax.swing.JButton();
+        replayButton = new javax.swing.JButton();
+        replayFileText = new javax.swing.JTextField();
+        selFileButton = new javax.swing.JButton();
+        replayStopButton = new javax.swing.JButton();
+        chkPlayOriginalSpeed = new javax.swing.JCheckBox();
+        chkLoopAtEnd = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(startButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.startButton.text")); // NOI18N
         startButton.addActionListener(new java.awt.event.ActionListener() {
@@ -75,14 +85,20 @@ public final class ConfigTopComponent extends TopComponent {
             }
         });
 
-        portComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "None" }));
+        portComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
         portComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 portComboBoxActionPerformed(evt);
             }
         });
 
-        bitRateComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "10 Kbps", "20 Kbps", "50 Kbps", "100 Kbps", "125 Kbps", "250 Kbps", "500 Kbps", "750 Kbps", "1000 Kbps" }));
+        bitRateComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10 Kbps", "20 Kbps", "50 Kbps", "100 Kbps", "125 Kbps", "250 Kbps", "500 Kbps", "750 Kbps", "1000 Kbps" }));
+        bitRateComboBox.setSelectedIndex(4);
+        bitRateComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bitRateComboBoxActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.jLabel1.text")); // NOI18N
 
@@ -103,30 +119,102 @@ public final class ConfigTopComponent extends TopComponent {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(debugDataButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.debugDataButton.text")); // NOI18N
+        debugDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                debugDataButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(debugStop, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.debugStop.text")); // NOI18N
+        debugStop.setEnabled(false);
+        debugStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                debugStopActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(replayButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.replayButton.text")); // NOI18N
+        replayButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                replayButtonActionPerformed(evt);
+            }
+        });
+
+        replayFileText.setText(org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.replayFileText.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(selFileButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.selFileButton.text")); // NOI18N
+        selFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selFileButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(replayStopButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.replayStopButton.text")); // NOI18N
+        replayStopButton.setEnabled(false);
+        replayStopButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                replayStopButtonActionPerformed(evt);
+            }
+        });
+
+        chkPlayOriginalSpeed.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkPlayOriginalSpeed, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.chkPlayOriginalSpeed.text")); // NOI18N
+        chkPlayOriginalSpeed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPlayOriginalSpeedActionPerformed(evt);
+            }
+        });
+
+        chkLoopAtEnd.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkLoopAtEnd, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.chkLoopAtEnd.text")); // NOI18N
+        chkLoopAtEnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLoopAtEndActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(portComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(startButton)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(stopButton)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(bitRateComboBox, 0, 180, Short.MAX_VALUE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(refreshButton)
-                .addContainerGap(155, Short.MAX_VALUE))
+                                .addComponent(portComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(startButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(stopButton)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(bitRateComboBox, 0, 180, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refreshButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(debugStop)
+                            .addComponent(debugDataButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(replayFileText, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(selFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkLoopAtEnd)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(replayButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(replayStopButton))
+                            .addComponent(chkPlayOriginalSpeed))))
+                .addContainerGap(107, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,7 +236,23 @@ public final class ConfigTopComponent extends TopComponent {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(stopButton))
-                .addContainerGap(203, Short.MAX_VALUE))
+                .addGap(35, 35, 35)
+                .addComponent(debugDataButton)
+                .addGap(1, 1, 1)
+                .addComponent(debugStop)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(selFileButton)
+                    .addComponent(replayFileText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkPlayOriginalSpeed)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkLoopAtEnd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(replayButton)
+                    .addComponent(replayStopButton))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -161,7 +265,8 @@ public final class ConfigTopComponent extends TopComponent {
         int speed = this.bitRateComboBox.getSelectedIndex();
 
         DeviceManager.openDevice(portName, speed);
-        startButton.setEnabled(false);
+
+        setAllButtonStates(false);
         stopButton.setEnabled(true);
         
     }//GEN-LAST:event_startButtonActionPerformed
@@ -176,11 +281,11 @@ public final class ConfigTopComponent extends TopComponent {
         } 
         String portName = this.portComboBox.getSelectedItem().toString();
         if (DeviceManager.isDeviceOpen(portName)) {
-            startButton.setEnabled(false);
+            setAllButtonStates(false);
             stopButton.setEnabled(true);
         } else {
-            startButton.setEnabled(true);
-            stopButton.setEnabled(false);
+            setAllButtonStates(false);
+            turnOnStartButtons(true);
         }
     }//GEN-LAST:event_portComboBoxActionPerformed
 
@@ -188,17 +293,125 @@ public final class ConfigTopComponent extends TopComponent {
         String portName = this.portComboBox.getSelectedItem().toString();
         if (DeviceManager.isDeviceOpen(portName)) {
             DeviceManager.closeDevice(portName);
-            stopButton.setEnabled(false);
-            startButton.setEnabled(true);        
+            
+            setAllButtonStates(false);
+            turnOnStartButtons(true);
         }
     }//GEN-LAST:event_stopButtonActionPerformed
 
+    private void bitRateComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bitRateComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bitRateComboBoxActionPerformed
+
+    private void debugDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugDataButtonActionPerformed
+        // This button will generate test data.
+        setAllButtonStates(false);
+        debugStop.setEnabled(true);
+        
+        // We use a fake device name to do this.
+        DeviceManager.openDevice("TESTDATA", 0);
+
+        
+    }//GEN-LAST:event_debugDataButtonActionPerformed
+
+    private void debugStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugStopActionPerformed
+        // Stop generating test data.
+        setAllButtonStates(false);
+        turnOnStartButtons(true);
+        
+        if (DeviceManager.isDeviceOpen("TESTDATA")) {
+            DeviceManager.closeDevice("TESTDATA");
+        }
+        
+    }//GEN-LAST:event_debugStopActionPerformed
+
+    private void setAllButtonStates(boolean state)
+    {
+        // Set the enabled state of all buttons.
+        debugStop.setEnabled(state);
+        replayStopButton.setEnabled(state);
+        turnOnStartButtons(state);
+    }
+    
+    private void turnOnStartButtons(boolean state)
+    {
+        // These buttons all get enabled together as they can start things.
+        selFileButton.setEnabled(state);
+        replayFileText.setEnabled(state);
+        debugDataButton.setEnabled(state);
+        startButton.setEnabled(state);
+        portComboBox.setEnabled(state);
+        replayButton.setEnabled(state);
+        bitRateComboBox.setEnabled(state);
+        refreshButton.setEnabled(state);
+        chkLoopAtEnd.setEnabled(state);
+        chkPlayOriginalSpeed.setEnabled(state);
+    }
+    
+    private void selFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selFileButtonActionPerformed
+        // Choose a file.
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("ASCII Logs", "asc");
+        chooser.setFileFilter(filter);
+        int returnVal = chooser.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            replayFileText.setText(chooser.getSelectedFile().getPath());
+        }
+
+    }//GEN-LAST:event_selFileButtonActionPerformed
+
+    private void replayStopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayStopButtonActionPerformed
+        // Stop playing the file.
+
+        if (DeviceManager.isDeviceOpen("TESTDATA")) {
+            DeviceManager.closeDevice("TESTDATA");
+        }
+
+        setAllButtonStates(false);
+        turnOnStartButtons(true);
+        
+    }//GEN-LAST:event_replayStopButtonActionPerformed
+
+    private void replayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayButtonActionPerformed
+        // Start playing the file.
+        
+        String filePath = replayFileText.getText();
+        
+        if (filePath != "")
+        {
+            setAllButtonStates(false);
+            replayStopButton.setEnabled(true);
+
+            // We use a fake device name to do this.
+            DeviceManager.openDevice("TESTDATA", filePath, chkPlayOriginalSpeed.isSelected(), chkLoopAtEnd.isSelected() );
+        }
+        
+        
+    }//GEN-LAST:event_replayButtonActionPerformed
+
+    private void chkPlayOriginalSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPlayOriginalSpeedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkPlayOriginalSpeedActionPerformed
+
+    private void chkLoopAtEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLoopAtEndActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkLoopAtEndActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> bitRateComboBox;
+    private javax.swing.JCheckBox chkLoopAtEnd;
+    private javax.swing.JCheckBox chkPlayOriginalSpeed;
+    private javax.swing.JButton debugDataButton;
+    private javax.swing.JButton debugStop;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JComboBox<String> portComboBox;
     private javax.swing.JButton refreshButton;
+    private javax.swing.JButton replayButton;
+    private javax.swing.JTextField replayFileText;
+    private javax.swing.JButton replayStopButton;
+    private javax.swing.JButton selFileButton;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
     // End of variables declaration//GEN-END:variables

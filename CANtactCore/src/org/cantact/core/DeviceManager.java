@@ -29,8 +29,26 @@ public class DeviceManager {
     }
 
     public static void openDevice(String deviceName, int speed) {
-        device = new CantactDevice(deviceName);
+        
+        // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
+        if (deviceName == "TESTDATA")
+            device = new CantactFakeDevice("");
+        else
+            device = new CantactDevice(deviceName);
+        
+        
         device.setSpeedMode(speed);
+        device.start();
+    }
+    
+    public static void openDevice(String deviceName, String replayFile, boolean playOriginalSpeed, boolean loopAtEnd) {
+        
+        // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
+        device = new CantactFakeDevice("");
+        
+        CantactFakeDevice cfd = (CantactFakeDevice)device;
+        cfd.ReplayFile(replayFile, playOriginalSpeed, loopAtEnd); // Tell the fake device to replay this file.
+        
         device.start();
     }
     

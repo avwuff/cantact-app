@@ -4,6 +4,7 @@ public class CanFrame {
     private int id;
     private int dlc;
     private int[] data;
+    private float timeStamp = -1; // Used only in fake replay mode.
     
     public int getId() {
         return this.id;
@@ -14,6 +15,11 @@ public class CanFrame {
     
     public int getDlc() {
         return this.dlc;
+    }
+    
+    public float getTimestamp()
+    {
+        return timeStamp;
     }
     public void setDlc(int new_dlc) {
         this.dlc = new_dlc;
@@ -27,5 +33,9 @@ public class CanFrame {
         // copy into empty array to ensure length is 8
         System.arraycopy(new_data, 0, result, 0, new_data.length);
         this.data = result;
+    }
+    public void setTimestamp(float ts)
+    {
+        timeStamp = ts;
     }
 }
