@@ -20,11 +20,13 @@ The `ant` and `netbeans` packages.
 
 ## Features
 - Display of CAN bus trace
-- Live display, showing the most recent data for each frame
+- Live display, showing the most recent data for each frame, in HEX, DEC, and ASCII. 
+- Ability to mute Live display bytes, as well as convert bytes to higher bit numbers.
 - Simple transmission of CAN frames
 - Javascript scripting interface
 - ISOTP transmit and receive
 - Saving of CAN traces (in candump format)
+- Replaying of CAN traces into Live window (coming soon: ability to replay a trace and transmit)
 
 ## TODO
 - OBD-II, and UDS protocol implementations
