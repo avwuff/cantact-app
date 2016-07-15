@@ -165,6 +165,11 @@ public final class TransmitTopComponent extends TopComponent {
         add(jLabel2, gridBagConstraints);
 
         dlcComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        dlcComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dlcComboBoxActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -214,6 +219,20 @@ public final class TransmitTopComponent extends TopComponent {
         DeviceManager.transmit(txFrame);
     }//GEN-LAST:event_transmitButtonActionPerformed
 
+    private void dlcComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dlcComboBoxActionPerformed
+        // TODO add your handling code here:
+        int dlcByteCount = Integer.decode(dlcComboBox.getSelectedItem().toString());
+        byte0Field.setEnabled(dlcByteCount>0);
+        byte1Field.setEnabled(dlcByteCount>1);
+        byte2Field.setEnabled(dlcByteCount>2);
+        byte3Field.setEnabled(dlcByteCount>3);
+        byte4Field.setEnabled(dlcByteCount>4);
+        byte5Field.setEnabled(dlcByteCount>5);
+        byte6Field.setEnabled(dlcByteCount>6);        
+        byte7Field.setEnabled(dlcByteCount>7);
+        
+    }//GEN-LAST:event_dlcComboBoxActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField byte0Field;
@@ -234,6 +253,14 @@ public final class TransmitTopComponent extends TopComponent {
     @Override
     public void componentOpened() {
         // TODO add custom code on component opening
+        byte0Field.setEnabled(false);
+        byte1Field.setEnabled(false);
+        byte2Field.setEnabled(false);
+        byte3Field.setEnabled(false);
+        byte4Field.setEnabled(false);
+        byte5Field.setEnabled(false);
+        byte6Field.setEnabled(false);        
+        byte7Field.setEnabled(false);
     }
 
     @Override

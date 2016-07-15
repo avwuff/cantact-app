@@ -17,7 +17,7 @@ import javax.swing.Timer;
  *
  * @author Avatar-X
  */
-public class CantactFakeDevice extends CantactDevice {
+public class FileReplayer {
 
     // This class provides fake CAN data for when you are testing stuff and don't have a car connected.
     private boolean isOpen;
@@ -40,7 +40,7 @@ public class CantactFakeDevice extends CantactDevice {
     private boolean pb_wait = false;
     private String pb_fileName; // The file name to playback.
 
-    public CantactFakeDevice(String deviceName) {
+    public FileReplayer(String deviceName) {
         super("");
 
         ActionListener taskPerformer = new ActionListener() {

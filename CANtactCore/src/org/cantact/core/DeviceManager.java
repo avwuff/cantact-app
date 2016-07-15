@@ -1,6 +1,7 @@
 package org.cantact.core;
 
 import java.util.ArrayList;
+import org.junit.Test;
 
 public class DeviceManager {
 
@@ -29,40 +30,53 @@ public class DeviceManager {
     }
 
     public static void openDevice(String deviceName, int speed) {
-        
+
         // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
-        if (deviceName == "TESTDATA")
+        if (deviceName == "TESTDATA") {
             device = new CantactFakeDevice("");
-        else
+        } else {
             device = new CantactDevice(deviceName);
-        
-        
+        }
+
         device.setSpeedMode(speed);
         device.start();
     }
-    
-    public static void openDevice(String deviceName, String replayFile, boolean playOriginalSpeed, boolean loopAtEnd) {
-        
+
+    public static boolean openDevice(String deviceName, String replayFile, boolean playOriginalSpeed, boolean loopAtEnd) {
+
         // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
         device = new CantactFakeDevice("");
-        
-        CantactFakeDevice cfd = (CantactFakeDevice)device;
+
+        CantactFakeDevice cfd = (CantactFakeDevice) device;
         cfd.ReplayFile(replayFile, playOriginalSpeed, loopAtEnd); // Tell the fake device to replay this file.
-        
-        device.start();
-    }
-    
-    public static void transmit(CanFrame txFrame) {
-        if (device != null) {
-            device.sendFrame(txFrame);
-            for (CanListener l : canListeners) {
-                l.canReceived(txFrame);
-            }
-        }
+
+        return device.start();
     }
 
-    public static void closeDevice(String portName) {
-        device.stop();
+    @Test(timeout = 500)
+    public static boolean transmit(CanFrame txFrame) {
+        if (device != null) {
+            if (device.sendFrame(txFrame)) {
+                for (CanListener l : canListeners) {
+                    l.canReceived(txFrame);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean transmitNoCheck(CanFrame txFrame) {
+        if (device != null) {
+            if (device.sendFrame(txFrame)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean closeDevice(String portName) {
+        return device.stop();
     }
 
     static void giveFrame(CanFrame f) {

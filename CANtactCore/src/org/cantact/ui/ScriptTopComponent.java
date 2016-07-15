@@ -13,6 +13,7 @@ import org.cantact.core.ScriptManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
@@ -155,8 +156,8 @@ public final class ScriptTopComponent extends TopComponent {
            scriptNameLabel.setText(chooser.getSelectedFile().getName());
             try {
                 scriptEditorPane.setPage(Utilities.toURI(chooser.getSelectedFile()).toURL());
-            } catch (IOException e) {
-                
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
     }//GEN-LAST:event_openButtonActionPerformed
