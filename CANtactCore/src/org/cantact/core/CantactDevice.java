@@ -11,6 +11,7 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import org.junit.Test;
 
 public class CantactDevice {
 
@@ -18,8 +19,7 @@ public class CantactDevice {
     private int speedMode = 0;
 
     public CantactDevice(String deviceName) {
-        if (deviceName != "")
-        {
+        if (!deviceName.equals("")) {
             serialPort = new SerialPort(deviceName);
         }
     }
@@ -47,12 +47,12 @@ public class CantactDevice {
         return SerialPortList.getPortNames();
     }
 
-    public void start() {
+    public boolean start() {
         try {
             serialPort.openPort();
             if (!serialPort.isOpened()) {
                 // TODO: throw error
-                return;
+                return true;
             }
             serialPort.setParams(115200, 8, 1, 0);
 
@@ -64,15 +64,17 @@ public class CantactDevice {
             serialPort.writeBytes("O\r".getBytes());
             SerialPortEventListener listener = new CantactDeviceListener();
             serialPort.addEventListener(listener);
+            return true;
         } catch (SerialPortException ex) {
             // TODO: error handling
             System.out.println(ex);
+            return false;
         }
     }
 
-    public void stop() {
+    public boolean stop() {
         if (serialPort == null) {
-            return;
+            return true;
         }
 
         try {
@@ -80,8 +82,10 @@ public class CantactDevice {
             serialPort.removeEventListener();
             serialPort.purgePort(SerialPort.PURGE_RXABORT | SerialPort.PURGE_TXCLEAR);
             serialPort.closePort();
+            return true;
         } catch (SerialPortException ex) {
             System.out.println(ex);
+            return false;
         }
     }
 
@@ -112,11 +116,10 @@ public class CantactDevice {
         String idString = byteArrayToString(idBytes);
         id = Integer.valueOf(idString, 16);
         result.setId(id);
-        
 
         dlc = Integer.valueOf(byteArrayToString(dlcBytes));
         result.setDlc(dlc);
-                
+
         int[] data = {0, 0, 0, 0, 0, 0, 0, 0};
         for (int i = 0; i < dlc; i++) {
             String byteString;
@@ -129,12 +132,15 @@ public class CantactDevice {
         return result;
     }
 
-    public void sendFrame(CanFrame frame) {
+    @Test(timeout = 500)
+    public boolean sendFrame(CanFrame frame) {
         String slcanString = frameToSlcan(frame);
         try {
             serialPort.writeString(slcanString);
+            return true;
         } catch (SerialPortException ex) {
             Logger.getLogger(CantactDevice.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 
@@ -193,5 +199,3 @@ public class CantactDevice {
         }
     }
 }
-
-
