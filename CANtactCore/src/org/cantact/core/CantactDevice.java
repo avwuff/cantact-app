@@ -11,6 +11,7 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import org.junit.Test;
 
 public class CantactDevice {
 
@@ -18,8 +19,7 @@ public class CantactDevice {
     private int speedMode = 0;
 
     public CantactDevice(String deviceName) {
-        if (deviceName.equals(""))
-        {
+        if (!deviceName.equals("")) {
             serialPort = new SerialPort(deviceName);
         }
     }
@@ -116,11 +116,10 @@ public class CantactDevice {
         String idString = byteArrayToString(idBytes);
         id = Integer.valueOf(idString, 16);
         result.setId(id);
-        
 
         dlc = Integer.valueOf(byteArrayToString(dlcBytes));
         result.setDlc(dlc);
-                
+
         int[] data = {0, 0, 0, 0, 0, 0, 0, 0};
         for (int i = 0; i < dlc; i++) {
             String byteString;
@@ -133,6 +132,7 @@ public class CantactDevice {
         return result;
     }
 
+    @Test(timeout = 500)
     public boolean sendFrame(CanFrame frame) {
         String slcanString = frameToSlcan(frame);
         try {
@@ -199,5 +199,3 @@ public class CantactDevice {
         }
     }
 }
-
-

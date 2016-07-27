@@ -53,7 +53,7 @@ public final class ConfigTopComponent extends TopComponent {
             }
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -77,6 +77,7 @@ public final class ConfigTopComponent extends TopComponent {
         replayStopButton = new javax.swing.JButton();
         chkPlayOriginalSpeed = new javax.swing.JCheckBox();
         chkLoopAtEnd = new javax.swing.JCheckBox();
+        chkHardwareReplay = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(startButton, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.startButton.text")); // NOI18N
         startButton.addActionListener(new java.awt.event.ActionListener() {
@@ -174,6 +175,14 @@ public final class ConfigTopComponent extends TopComponent {
             }
         });
 
+        chkHardwareReplay.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkHardwareReplay, org.openide.util.NbBundle.getMessage(ConfigTopComponent.class, "ConfigTopComponent.chkHardwareReplay.text")); // NOI18N
+        chkHardwareReplay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkHardwareReplayActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -213,7 +222,10 @@ public final class ConfigTopComponent extends TopComponent {
                                 .addComponent(replayButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(replayStopButton))
-                            .addComponent(chkPlayOriginalSpeed))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(chkPlayOriginalSpeed)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkHardwareReplay)))))
                 .addContainerGap(107, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -240,19 +252,21 @@ public final class ConfigTopComponent extends TopComponent {
                 .addComponent(debugDataButton)
                 .addGap(1, 1, 1)
                 .addComponent(debugStop)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(selFileButton)
                     .addComponent(replayFileText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkPlayOriginalSpeed)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkPlayOriginalSpeed)
+                    .addComponent(chkHardwareReplay))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkLoopAtEnd)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(replayButton)
                     .addComponent(replayStopButton))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -268,7 +282,7 @@ public final class ConfigTopComponent extends TopComponent {
 
         setAllButtonStates(false);
         stopButton.setEnabled(true);
-        
+
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
@@ -278,7 +292,7 @@ public final class ConfigTopComponent extends TopComponent {
     private void portComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portComboBoxActionPerformed
         if (this.portComboBox.getSelectedItem() == null) {
             return;
-        } 
+        }
         String portName = this.portComboBox.getSelectedItem().toString();
         if (DeviceManager.isDeviceOpen(portName)) {
             setAllButtonStates(false);
@@ -293,7 +307,7 @@ public final class ConfigTopComponent extends TopComponent {
         String portName = this.portComboBox.getSelectedItem().toString();
         if (DeviceManager.isDeviceOpen(portName)) {
             DeviceManager.closeDevice(portName);
-            
+
             setAllButtonStates(false);
             turnOnStartButtons(true);
         }
@@ -307,34 +321,32 @@ public final class ConfigTopComponent extends TopComponent {
         // This button will generate test data.
         setAllButtonStates(false);
         debugStop.setEnabled(true);
-        
+
         // We use a fake device name to do this.
         DeviceManager.openDevice("TESTDATA", 0);
 
-        
+
     }//GEN-LAST:event_debugDataButtonActionPerformed
 
     private void debugStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugStopActionPerformed
         // Stop generating test data.
         setAllButtonStates(false);
         turnOnStartButtons(true);
-        
+
         if (DeviceManager.isDeviceOpen("TESTDATA")) {
             DeviceManager.closeDevice("TESTDATA");
         }
-        
+
     }//GEN-LAST:event_debugStopActionPerformed
 
-    private void setAllButtonStates(boolean state)
-    {
+    private void setAllButtonStates(boolean state) {
         // Set the enabled state of all buttons.
         debugStop.setEnabled(state);
         replayStopButton.setEnabled(state);
         turnOnStartButtons(state);
     }
-    
-    private void turnOnStartButtons(boolean state)
-    {
+
+    private void turnOnStartButtons(boolean state) {
         // These buttons all get enabled together as they can start things.
         selFileButton.setEnabled(state);
         replayFileText.setEnabled(state);
@@ -347,7 +359,7 @@ public final class ConfigTopComponent extends TopComponent {
         chkLoopAtEnd.setEnabled(state);
         chkPlayOriginalSpeed.setEnabled(state);
     }
-    
+
     private void selFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selFileButtonActionPerformed
         // Choose a file.
         JFileChooser chooser = new JFileChooser();
@@ -368,26 +380,32 @@ public final class ConfigTopComponent extends TopComponent {
             DeviceManager.closeDevice("TESTDATA");
         }
 
+        String portName = this.portComboBox.getSelectedItem().toString();
+        if (DeviceManager.isDeviceOpen(portName)) {
+            DeviceManager.closeDevice(portName);
+        }
+
         setAllButtonStates(false);
         turnOnStartButtons(true);
-        
+
     }//GEN-LAST:event_replayStopButtonActionPerformed
 
     private void replayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayButtonActionPerformed
         // Start playing the file.
-        
+
         String filePath = replayFileText.getText();
-        
-        if (filePath != "")
-        {
+        int speed = this.bitRateComboBox.getSelectedIndex();
+        String portName = this.portComboBox.getSelectedItem().toString();
+
+        if (!filePath.equals("")) {
             setAllButtonStates(false);
             replayStopButton.setEnabled(true);
 
             // We use a fake device name to do this.
-            DeviceManager.openDevice("TESTDATA", filePath, chkPlayOriginalSpeed.isSelected(), chkLoopAtEnd.isSelected() );
+            DeviceManager.openDevice(portName, filePath, chkPlayOriginalSpeed.isSelected(), chkLoopAtEnd.isSelected(), chkHardwareReplay.isSelected(), speed);
         }
-        
-        
+
+
     }//GEN-LAST:event_replayButtonActionPerformed
 
     private void chkPlayOriginalSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPlayOriginalSpeedActionPerformed
@@ -398,8 +416,13 @@ public final class ConfigTopComponent extends TopComponent {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkLoopAtEndActionPerformed
 
+    private void chkHardwareReplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkHardwareReplayActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkHardwareReplayActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> bitRateComboBox;
+    private javax.swing.JCheckBox chkHardwareReplay;
     private javax.swing.JCheckBox chkLoopAtEnd;
     private javax.swing.JCheckBox chkPlayOriginalSpeed;
     private javax.swing.JButton debugDataButton;

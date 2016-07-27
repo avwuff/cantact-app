@@ -17,16 +17,14 @@ import javax.swing.Timer;
  *
  * @author Avatar-X
  */
-public class FileReplayer {
+public class CantactReplayDevice extends CantactDevice {
 
     // This class provides fake CAN data for when you are testing stuff and don't have a car connected.
-    private boolean isOpen;
     private Timer timer;
     private int fRand = 0;
     private int fType = 0; // The Type of the last frame we generated.
     private int fLast = 0;
     private FileReader fr;
-    private boolean replayMode = false;
     private BufferedReader br;
     private Pattern pPat = Pattern.compile("\\((.*)\\) can0 ([0-9A-F]*)#(.*)");
     private boolean playOrigSpeed;
@@ -40,35 +38,21 @@ public class FileReplayer {
     private boolean pb_wait = false;
     private String pb_fileName; // The file name to playback.
 
-    public FileReplayer(String deviceName) {
-        super("");
-
-        ActionListener taskPerformer = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                // The timer fires.  In ReplayMode, we replay the next line in the file.
-                // In other modes, we generate a new frame.
-
-                if (replayMode) {
-                    replayFrame();
-                } else {
-                    generateFrame();
-                }
-            }
-        };
-
-        timer = new Timer(100, taskPerformer);
-        timer.setInitialDelay(0);
-    }
-
-    public void ReplayFile(String filePath, boolean playOriginalSpeed, boolean loopAtEnd) {
+    public CantactReplayDevice(String deviceName, String filePath, boolean playOriginalSpeed, boolean loopAtEnd) {
+        super(deviceName);
         // Open this file for playback.
-        replayMode = true;
         playOrigSpeed = playOriginalSpeed;
         playLoopAtEnd = loopAtEnd;
         pb_wait = false;
         pb_fileName = filePath;
 
-        startPlaybackOfFile();
+        ActionListener taskPerformer = (ActionEvent evt) -> {
+            // The timer fires.  We replay the next line in the file.            
+            replayFrame();
+        };
+
+        timer = new Timer(100, taskPerformer);
+        timer.setInitialDelay(0);
     }
 
     private void startPlaybackOfFile() {
@@ -87,21 +71,11 @@ public class FileReplayer {
     }
 
     @Override
-    public boolean isOpened() {
-        return isOpen;
-    }
-
-    @Override
-    public String getDeviceName() {
-        return "TESTDATA";
-    }
-
-    @Override
     public boolean start() {
         try {
-            isOpen = true;
             // TODO: Start sending junk data
-            timer.start();
+            super.start();
+            startPlaybackOfFile();
             return true;
         } catch (Exception ex) {
             // TODO: error handling
@@ -112,16 +86,9 @@ public class FileReplayer {
 
     @Override
     public boolean stop() {
-        isOpen = false;
         // Stop sending data.
         timer.stop();
-        return true;
-    }
-
-    @Override
-    public boolean sendFrame(CanFrame frame) {
-        // Do nothing
-        return true;
+        return super.stop();
     }
 
     private void replayFrame() {
@@ -202,57 +169,6 @@ public class FileReplayer {
         f.setDlc(pb_dlc);
         f.setData(pb_data);
         f.setTimestamp(pb_timeIndex);
-
-        DeviceManager.giveFrame(f);
-
+        DeviceManager.transmit(f);
     }
-
-    private void generateFrame() {
-        // Generate a frame of junk
-        CanFrame f = new CanFrame();
-
-        int[] data;
-
-        switch (fType) {
-            case 0: // This one has data that never changes.
-                f.setId(204);
-                f.setDlc(8);
-                data = new int[]{0, 1, 65, 66, 67, 5, 6, 7};
-                f.setData(data);
-                break;
-            case 1: // This one has data where one of the values increments.
-                f.setId(99);
-                f.setDlc(8);
-                data = new int[]{6, 45, 44, 2, 6, 23, fRand % 255, 7};
-                f.setData(data);
-                fRand++;
-                break;
-            case 2: // This one has data where the value changes between 3 different values
-                f.setId(300);
-                f.setDlc(8);
-                switch (fLast) {
-                    default:
-                        data = new int[]{33, 128, 32, 132, 232, 222, 102, 0};
-                        break;
-                    case 1:
-                        data = new int[]{33, 30, 50, 132, 232, 30, 102, 0};
-                        break;
-                    case 2:
-                        data = new int[]{33, 50, 70, 132, 232, 60, 102, 0};
-                        break;
-                }
-
-                f.setData(data);
-
-                fLast = (fLast + 1) % 3;
-
-        }
-
-        // Increment the fake frame type
-        fType = (fType + 1) % 3;
-
-        DeviceManager.giveFrame(f);
-
-    }
-
 }

@@ -32,7 +32,7 @@ public class DeviceManager {
     public static void openDevice(String deviceName, int speed) {
 
         // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
-        if (deviceName == "TESTDATA") {
+        if (deviceName.equals("TESTDATA")) {
             device = new CantactFakeDevice("");
         } else {
             device = new CantactDevice(deviceName);
@@ -42,13 +42,20 @@ public class DeviceManager {
         device.start();
     }
 
-    public static boolean openDevice(String deviceName, String replayFile, boolean playOriginalSpeed, boolean loopAtEnd) {
+    public static boolean openDevice(String deviceName, String replayFile, boolean playOriginalSpeed, boolean loopAtEnd, boolean hardwareReplay, int speed) {
 
-        // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
-        device = new CantactFakeDevice("");
+        if (hardwareReplay) {
+            // If this is a request for hardware replay, open a cantactreplay device (it inherits from CantactDevice)
+            device = new CantactReplayDevice(deviceName, replayFile, playOriginalSpeed, loopAtEnd);
+            device.setSpeedMode(speed);
 
-        CantactFakeDevice cfd = (CantactFakeDevice) device;
-        cfd.ReplayFile(replayFile, playOriginalSpeed, loopAtEnd); // Tell the fake device to replay this file.
+        } else {
+            // If this is a request for fake data, open a fake device (it inherits from CantactDevice)
+            device = new CantactFakeDevice("");
+
+            CantactFakeDevice cfd = (CantactFakeDevice) device;
+            cfd.ReplayFile(replayFile, playOriginalSpeed, loopAtEnd); // Tell the fake device to replay this file.
+        }
 
         return device.start();
     }
@@ -65,7 +72,7 @@ public class DeviceManager {
         }
         return false;
     }
-    
+
     public static boolean transmitNoCheck(CanFrame txFrame) {
         if (device != null) {
             if (device.sendFrame(txFrame)) {
